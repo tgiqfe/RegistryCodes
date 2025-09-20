@@ -11,7 +11,7 @@ namespace RegistryCodes
         /// <param name="isCreate"></param>
         /// <param name="writable"></param>
         /// <returns></returns>
-        public static RegistryKey GetRegistryKey(string path, bool isCreate, bool writable)
+        public static RegistryKey GetRegistryKey(string path, bool isCreate = false, bool writable = false)
         {
             string rootPath = path.Substring(0, path.IndexOf("\\"));
             string keyPath = path.Substring(path.IndexOf("\\") + 1);
@@ -27,6 +27,7 @@ namespace RegistryCodes
             };
             if (rootKey == null) return null;
 
+            if (isCreate) writable = true;
             return isCreate ?
                 rootKey.CreateSubKey(keyPath, writable) :
                 rootKey.OpenSubKey(keyPath, writable);
@@ -75,7 +76,7 @@ namespace RegistryCodes
                 RegistryValueKind.String => regKey.GetValue(name) as string,
                 RegistryValueKind.DWord => regKey.GetValue(name).ToString(),
                 RegistryValueKind.QWord => regKey.GetValue(name).ToString(),
-                RegistryValueKind.ExpandString =>
+                RegistryValueKind.ExpandString => noResolv ?
                     regKey.GetValue(name, "", RegistryValueOptions.DoNotExpandEnvironmentNames) as string :
                     regKey.GetValue(name) as string,
                 RegistryValueKind.Binary =>
